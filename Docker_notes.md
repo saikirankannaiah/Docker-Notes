@@ -1,6 +1,6 @@
 # Docker in a Month of Lunches
 
-## Chapter 2 - Understanding Docker Notes
+## Chapter 2 - Understanding Docker
 
 1. Docker doesn’t automatically clean up containers or application packages for you.
 When you quit Docker Desktop (or stop the Docker service), all your containers stop
@@ -83,3 +83,80 @@ still running.
     1. The Docker Engine makes all the features available through the Docker API, which is just a standard HTTP-based REST API. You can configure the Engine to make the API accessible only from the local computer (which is the default), or make it available to other computers on your network.
 
     1. The Docker command-line interface (CLI) is a client of the Docker API. When you run Docker commands, the CLI actually sends them to the Docker API, and the Docker Engine does the work.
+
+
+## Chapter 3 - Building own Docker Images
+
+1. To pull a docker image from the docker hub
+    ```
+    docker image pull name_of_the_image
+    ```
+
+1. Running a docker container in background and giving a docker container a name 
+
+    ```
+    docker container run -d --name some_name container_name
+    ```
+
+1. Using environment variables to pass parameters to docker container
+
+    ```
+    docker container run --env name_of_env_varibale=value_to_be_assigned name_of_the_docker_container
+    ```
+
+1. Writing your own docker file
+
+    ```
+    FROM diamol/node
+    ENV TARGET="blog.sixeyed.com"
+    ENV METHOD="HEAD"
+    ENV INTERVAL="3000"
+    WORKDIR /web-ping
+    COPY app.js .
+    CMD ["node", "/web-ping/app.js"]
+    ```
+
+    1. FROM —Every image has to start from another image. In this case, the web-ping image will use the diamol/node image as its starting point. That image has Node.js installed, which is everything the web-ping application needs to run.
+    1. ENV —Sets values for environment variables. The syntax is [key]="[value]", and there are three ENV instructions here, setting up three different environment variables.
+    1. WORKDIR —Creates a directory in the container image filesystem, and sets that to be the current working directory. The forward-slash syntax works for Linux and Windows containers, so this will create /web-ping on Linux and C:\web-ping on Windows.
+    1. COPY —Copies files or directories from the local filesystem into the container image. The syntax is [source path] [target path] —in this case, I’m copying app.js from my local machine into the working directory in the image.
+    1. CMD —Specifies the command to run when Docker starts a container from the image. This runs Node.js, starting the application code in app.js.
+
+1. To create a docker image from a docker file
+
+    ```
+    docker image build --tag name_of_the_tag path_to_the_docker_file_and_other_related_files
+    ```
+
+1. Listing all docker images starting with w*
+
+    ```
+    docker image ls w*
+    ```
+
+1. To get a breif history of how a docker image was built
+
+    ```
+    docker image history image_name
+    ```
+
+1. The system df command shows exactly how much disk space Docker is using
+
+    ```
+    docker system df
+    ```
+
+1. To create a docker image from an existing docker image and with no access to the docker file, one could change a single file in the docker image and commit as follows
+
+    ```
+    docker container run -it --name ch03lab diamol/ch03-lab
+
+    echo Elton >> ch03.txt
+
+    exit
+
+    docker container commit ch03lab ch03-lab-soln
+    ```
+
+## Chapter 4 - Packaging applications from source code into docker images
+
