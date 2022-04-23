@@ -160,3 +160,21 @@ still running.
 
 ## Chapter 4 - Packaging applications from source code into docker images
 
+1. Docker files can sometimes have multistage builds which might be essential for the app. 
+
+    ```
+    # Example of a multistage dockerfile
+
+    FROM diamol/base AS build-stage
+    RUN echo 'Building...' > /build.txt
+
+    FROM diamol/base AS test-stage
+    COPY --from=build-stage /build.txt /build.txt
+    RUN echo 'Testing...' >> /build.txt
+
+    FROM diamol/base
+    COPY --from=test-stage /build.txt /build.txt
+    CMD cat /build.txt
+    ```
+
+    Each of the above build stages run independently, but one can copy files and directories from previous stages.
